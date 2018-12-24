@@ -1,0 +1,478 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+
+    <h1>{{ header }}</h1>
+    <hr />
+    <p v-if="errors.length">
+        <b>Пожалуйста исправьте указанные ошибки:</b>
+        <hr />
+        <ul>
+            <li v-for="error in errors">{{ error }}</li>
+        </ul>
+    </p>
+    @*Если пользователь авторизован*@
+    <div v-if="isLoggedIn">
+        @Html.Partial("_PartialLogIn")
+    </div>
+    @*Регистрация пользователя*@
+    <div v-else-if="Registration">
+        @Html.Partial("_PartialRegistration")
+    </div>
+    @*Админ панель пользователя*@
+    <div v-else-if="isAdmin">
+        @Html.Partial("_PartialAdmin")
+    </div>
+    @*Авторизация пользователя*@
+    <div class="form-group" v-else>
+        @Html.Partial("_PartialSingUp")
+    </div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/vue")
+    <script>
+        var values = [];
+        var keys = '';
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                errors: [],
+                header: 'Авторизация пользователя',
+                isLoggedIn: false,
+                Registration: false,
+                isEdit: false,
+                isAdmin: false,
+                editIndex: null,
+                originalData: null,
+                Who: "",
+                Username: "Admin",
+                Password: "123456789", 
+                temp: [],
+                edit_values:
+                {
+                    Id: "",
+                    Password: "",
+                    Phone: "",
+                    City: "",
+                    PostalCode: "",
+                    Street1: "",
+                    Street2: "",
+                    Name: "",
+                    Surname: "",
+                    Middlename: "",
+                    Email: ""
+                },
+                admin_values: []
+                ,
+                reg_values: 
+                {
+                    Password: "123456789",
+                    Phone: "97777474846",
+                    City: "Ptz",
+                    PostalCode: "184016",
+                    Street1: "Drevlanka",
+                    Street2: "22 / 1",
+                    Name: "Alex",
+                    Surname: "Med",
+                    Middlename: "Bor",
+                    Email: "tomnolane2@yandex.ru",
+                    Notes: "new user"
+                },
+                values: [
+                    {
+                        name: '',
+                        middlename: '',
+                        surname: '',
+                        roles: '',
+                        login: '',
+                        phones: {},
+                        id: '', 
+                        address: {},
+                        emails: {},
+                        notes: '',
+                        changes: {},
+                        Email1: '',
+                        Email2: '',
+                        Email1_Type: '',
+                        Email2_Type: '',
+                        Phone1: '',
+                        Phone2: '',
+                        Phone1_Type: '',
+                        Phone2_Type: '',
+                    }
+                ]
+            }, 
+            computed: {
+                values: {
+                    get() {
+                        return this.values;
+                    }
+                }
+            },
+            methods: {
+                login() { 
+
+                    this.errors = [];
+
+                    if (!this.Username) {
+                        this.errors.push('Укажите имя.');
+                        return false;
+                    } 
+
+                    if (!this.Password) {
+                        this.errors.push('Укажите ваш пароль.');
+                        return false;
+                    } else if (!this.validPass(this.Password)) {
+                        this.errors.push('Пароль должен быть от 6 символов');
+                        return false;
+                    }
+
+                    this.getToken();
+
+                },
+                edit(item, index) {
+                    this.originalData = Object.assign({}, item); 
+                    this.editIndex = index
+                },
+                remove(item, index) {
+                    this.values.splice(index, 1)
+                },
+                cancel(item) {
+                    this.editIndex = null
+
+                    if (!this.originalData) {
+                        this.values.splice(this.values.indexOf(item), 1)
+                        return
+                    }
+
+                    Object.assign(item, this.originalData)
+                    this.originalData = null
+                },
+                save(item) {
+                   
+                    this.values[0].Username = this.Username;
+                    this.Who = this.Username;
+                    this.values[0].Email1 = this.values[0].emails[0].Value;
+                    this.values[0].Email1_Type = this.values[0].emails[0].Type;
+
+                    if (!!this.values[0].emails[1]) {
+                        this.values[0].Email2 = this.values[0].emails[1].Value;
+                        this.values[0].Email2_Type = this.values[0].emails[1].Type;
+                    }
+
+                    this.values[0].Phone1 = this.values[0].phones[0].Value;
+                    this.values[0].Phone1_Type = this.values[0].phones[0].Type;
+
+                    if (!!this.values[0].phones[1]) {
+                        this.values[0].Phone2 = this.values[0].phones[1].Value;
+                        this.values[0].Phone2_Type = this.values[0].phones[1].Type;
+                    }
+
+                    var data = Object.keys(this.values[0])
+                        .map(k => k + '=' + this.values[0][k])
+                        .join('&');
+
+                    this.errors = [];
+                     
+                    fetch("/EditPost",
+                        {
+                            method: "POST",
+                            headers: { 'Accept': 'application/json, text/plain, */*', 'Content-Type': 'application/x-www-form-urlencoded', "Authorization": "Bearer " + sessionStorage.getItem('tokenKey') },
+                            body: data
+                        })
+                        .then(function (res) { return res.json(); })
+                        .then(function (data) {
+                            console.log(data);
+                            if (!data.message) {
+                                vm.header = 'Изменения выполнены успешно';
+                                vm.Username = vm.reg_values.Name;
+                                vm.Password = vm.reg_values.Password;
+                                vm.values = [
+                                    {
+                                        name: data.Name,
+                                        middlename: data.Middlename,
+                                        surname: data.Surname,
+                                        roles: data.Roles,
+                                        login: data.Login,
+                                        phones: data.Phones,
+                                        id: data.Id,
+                                        address: data.Address,
+                                        emails: data.Emails,
+                                        notes: data.Notes,
+                                        changes: data.Changes
+                                    }];
+                            }
+
+                            if (data.modelState) {
+                                for (keys in data.modelState) {
+                                    strValue = data.modelState[keys];
+                                    var _arr = Object.keys(strValue).map(function (k) { return strValue[k] });
+                                    //var _error = keys.replace("createModel.", "") + " : " + _arr[0];
+                                    var _error = _arr[0];
+                                    vm.errors.push(_error);
+                                }
+                            }
+                        }) 
+
+                    this.originalData = null
+                    this.editIndex = null
+                },
+                save2(item) {  
+
+                    item.Who = this.Who;
+                    console.log(item.Who);
+                    if (typeof (item.Emails) !== 'undefined') {
+                        item.Email1 = item.Emails[0].Value;
+                        item.Email1_Type = item.Emails[0].Type;
+                        if (!!item.Emails[1]) {
+                            item.Email2 = item.Emails[1].Value;
+                            item.Email2_Type = item.Emails[1].Type;
+                        } 
+                    }   
+
+                    if (item.Phones != null) {
+                        item.Phone1 = item.Phones[0].Value;
+                        item.Phone1_Type = item.Phones[0].Type;
+                        if (!!item.Phones[1]) {
+                            item.Phone2 = item.Phones[1].Value;
+                            item.Phone2_Type = item.Phones[1].Type;
+                        }
+                            
+                    }  
+
+                    var data = Object.keys(item).map(k => k + '=' + item[k]).join('&');
+
+                    this.errors = [];
+
+                    fetch("/EditAdmin",
+                    {
+                        method: "POST",
+                        headers: { 'Accept': 'application/json, text/plain, */*', 'Content-Type': 'application/x-www-form-urlencoded', "Authorization": "Bearer " + sessionStorage.getItem('tokenKey') },
+                        body: data
+                    })
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        console.log(data);
+                        if (!data.message) {
+                            vm.header = 'Изменения выполнены успешно';
+                            vm.admin_values = [];
+                            vm.showAdmin(); 
+                        }
+
+                        if (data.modelState) {
+                            for (keys in data.modelState) {
+                                strValue = data.modelState[keys];
+                                var _arr = Object.keys(strValue).map(function (k) { return strValue[k] });
+                                var _error = _arr[0];
+                                vm.errors.push(_error);
+                            }
+                        }
+                    }) 
+
+                    this.originalData = null
+                    this.editIndex = null
+
+                },
+                showLogin() {
+                    this.isLoggedIn = false;
+                    this.Registration = false;
+                    this.isAdmin = false;
+                    this.header = 'Авторизация пользователя'; 
+                },
+                showRegistration() {
+                    this.Registration = true;
+                    this.isLoggedIn = false;
+                    this.isAdmin = false; 
+
+                    this.logout();
+                    this.header = 'Регистраиця нового пользователя';
+                },
+                showAdmin() {
+                    this.isLoggedIn = false;
+                    this.Registration = false;
+                    this.isAdmin = true;
+                    fetch("/Accounts",
+                        {
+                            method: "GET",
+                            headers: { 'Accept': 'application/json, text/plain, */*', 'Content-Type': 'application/x-www-form-urlencoded', "Authorization": "Bearer " + sessionStorage.getItem('tokenKey') },
+                        })
+                        .then(function (res) { return res.json(); })
+                        .then(function (data) {
+                            console.log(data);
+
+                            if (!data.message) {
+                                vm.admin_values.push(data); 
+
+                                vm.header = 'Админ панель'; 
+                            }
+
+                            if (data.modelState) {
+                                for (keys in data.modelState) {
+                                    strValue = data.modelState[keys];
+                                    var _arr = Object.keys(strValue).map(function (k) { return strValue[k] }); 
+                                    var _error = _arr[0];
+                                    vm.errors.push(_error);
+                                }
+                            }
+                        }) 
+                },
+                registration() {
+
+                    var data = Object.keys(this.reg_values)
+                        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(this.reg_values[k]))
+                        .join('&');
+
+                    this.errors = [];
+
+                    fetch("/Registration",
+                        {
+                            method: "POST",
+                            headers: { 'Accept': 'application/json, text/plain, */*', 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: data
+                        })
+                        .then(function (res) { return res.json(); })
+                        .then(function (data) {
+
+                            if (data == "OK") {
+                                vm.header = 'Регистрация выполнена успешно';
+                                vm.Username = vm.reg_values.Name;
+                                vm.Password = vm.reg_values.Password;
+                                vm.getToken([], vm.sendPost); // получить токен
+                            }
+
+                            if (data.modelState) {
+                                for (keys in data.modelState) {
+                                    strValue = data.modelState[keys];
+                                    var _arr = Object.keys(strValue).map(function (k) { return strValue[k] });
+                                    //var _error = keys.replace("createModel.", "") + " : " + _arr[0];
+                                    var _error = _arr[0];
+                                    vm.errors.push(_error);
+                                }
+                            }
+                        }) 
+                },
+                addError: function (t) {
+                    return this.errors.push(t);
+                },
+                getToken() {
+                     
+                var payload = {
+                    grant_type: 'password',
+                    username: this.Username,
+                    password: this.Password
+                    };
+
+                this.Who = this.Username;
+
+                var data = Object.keys(payload)
+                    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]))
+                    .join('&');
+
+                this.errors = [];
+
+                fetch("/token",
+                    {
+                        method: "POST",
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: data
+                    })
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        console.log(data)
+
+                        if (data.access_token)
+                            sessionStorage.setItem('tokenKey', data.access_token);
+
+                        if (!data.error_description)
+                            vm.sendPost('/LoginIn', data); 
+                        else
+                            vm.errors.push(data.error_description);
+                    })  
+                }, 
+                sendPost: function (url, data) {
+
+                    this.errors = [];
+
+                    if (sessionStorage.getItem('tokenKey') == null) {
+                        vm.getToken(vm.sendPost); // получить токен
+                    }
+
+                    fetch(url, {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json, text/plain, */*',
+                            'Content-Type': 'application/json',
+                            "Authorization": "Bearer " + sessionStorage.getItem('tokenKey')
+                        },
+                        body: JSON.stringify({ login: this.Username, password: this.Password })
+                    }).then(res => res.json())
+                        .then(res => { 
+                            if (res.message) {
+                                vm.errors.push(res.message);
+                                this.isLoggedIn = false;
+                                this.Registration = true;
+                            }
+                            else {
+                                console.log(res);
+                                this.values = [
+                                    {
+                                        name: res.Name,
+                                        middlename: res.Middlename,
+                                        surname: res.Surname,
+                                        roles: res.Roles,
+                                        login: res.Login,
+                                        phones: res.Phones,
+                                        id: res.Id,
+                                        address: res.Address,
+                                        emails: res.Emails,
+                                        notes: res.Notes,
+                                        changes: res.Changes
+                                    }
+                                ];
+
+                                if (this.values[0].roles == "Admin")
+                                    this.isAdmin = true;
+                                else 
+                                    this.isAdmin = false;
+
+                                this.header = "Добро пожаловать, " + res.Name;
+                                this.isLoggedIn = true;
+                                this.Registration = false;
+                            }
+                        }).catch(function (error) {
+                            vm.errors.push(res);
+                            console.log('request failed', error);
+                            this.isLoggedIn = false;
+                            this.Registration = true;
+                        })
+                },
+                recover() {
+
+                }, 
+                logout() {
+                    this.header = "Авторизируйтесь";
+                    this.isLoggedIn = false;
+                    sessionStorage.removeItem('tokenKey');
+                    this.values = null;
+                },
+                validEmail: function (email) {
+                    var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                    return re.test(email);
+                },
+                validPass: function (pass) {
+                    if ((pass + "").length < 6)
+                        return false;
+                    else
+                        return true;
+                },
+                sortedData: function (data) {
+                    return data.sort(function (a, b) {
+                        return a.id > b.id;
+                    })
+                }
+            }
+        })
+    </script>
+}

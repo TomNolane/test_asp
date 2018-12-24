@@ -1,0 +1,9 @@
+﻿<p>
+    <label class="label" for="Username">Логин</label>
+    <input class="form-control" type="text" v-model="Username" name="Username" placeholder="Логин">
+</p>
+<p>
+    <label class="label" for="Password">Пароль</label>
+    <input class="form-control" type="password" v-model="Password" name="Password" placeholder="Пароль">
+</p>
+<a v-on:click.prevent="login()" class="btn btn-default" href="">Авторизоваться</a>

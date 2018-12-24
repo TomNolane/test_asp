@@ -1,0 +1,155 @@
+﻿<h4>Основные данные пользователя {{ values[0].name }}</h4>
+<table class="table table-bordered mt-4">
+    <thead class="thead-light">
+        <tr>
+            <th width="1">#</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Отчество</th>
+            <th>Роль</th>
+            <th>Логин</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(item, index) in values" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td class="hidden">
+                <input type="hidden" v-model="item.id">
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.name }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" v-model="item.name">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.surname }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" v-model="item.surname">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.middlename }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" type="text" v-model="item.middlename">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.roles }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" v-model="item.roles">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.login }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" type="text" v-model="item.login">
+                </span>
+            </td>
+
+            <td>
+                <span v-if="editIndex !== index">
+                    <button @@click="edit(item, index)" class="btn btn-sm btn-outline-secondary mr-2">Редактировать</button>
+                    @*<button @@click="remove(item, index)" class="btn btn-sm btn-outline-secondary mr-2">Удалить</button>*@
+                </span>
+                <span v-else>
+                    <button class="btn btn-sm btn-outline-secondary mr-2" @@click="cancel(item)">Отмена</button>
+                    <button class="btn btn-sm btn-outline-secondary mr-2" @@click="save(item)">Сохранить</button>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<h4>Данные email</h4>
+<table class="table table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th width="1">#</th>
+            <th>Тип</th>
+            <th>Email</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(item, index) in values[0].emails" :key="index">
+            <td>{{ index + 1 }}</td>
+
+            <td>
+                <span v-if="editIndex !== index">{{ item.Type }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" type="text" v-model="item.Type">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.Value }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" type="text" v-model="item.Value">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">
+                    <button @@click="edit(item, index)" class="btn btn-sm btn-outline-secondary mr-2">Редактировать</button>
+                </span>
+                <span v-else>
+                    <button class="btn btn-sm btn-outline-secondary mr-2" @@click="cancel(item)">Отмена</button>
+                    <button class="btn btn-sm btn-outline-secondary mr-2" @@click="save(item)">Сохранить</button>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<h4>Данные номеров телефона пользователя</h4>
+<table class="table table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th width="1">#</th>
+            <th>Тип</th>
+            <th>№ телефона</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(item, index) in values[0].phones" :key="index">
+            <td>{{ index + 1 }}</td>
+
+            <td>
+                <span v-if="editIndex !== index">{{ item.Type }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" type="text" v-model="item.Type">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">{{ item.Value }}</span>
+                <span v-if="editIndex === index">
+                    <input class="form-control form-control-sm" type="text" v-model="item.Value">
+                </span>
+            </td>
+            <td>
+                <span v-if="editIndex !== index">
+                    <button @@click="edit(item, index)" class="btn btn-sm btn-outline-secondary mr-2">Редактировать</button>
+                </span>
+                <span v-else>
+                    <button class="btn btn-sm btn-outline-secondary mr-2" @@click="cancel(item)">Отмена</button>
+                    <button class="btn btn-sm btn-outline-secondary mr-2" @@click="save(item)">Сохранить</button>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<h4>Дата и время изменения профиля</h4>
+<table class="table table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th width="1">#</th>
+            <th>Дата изменения профиля</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(item, index) in values[0].changes" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ item.Date }}</td>
+        </tr>
+    </tbody>
+</table>
+<a class="btn btn-info" href="" v-on:click.prevent="logout">Выйти</a>

@@ -1,0 +1,124 @@
+﻿<div v-for="(_values, index) in admin_values" :key="index">
+    <h4>Основные данные пользователя {{ admin_values[index].name }}</h4>
+    <table class="table table-bordered mt-4">
+        <thead class="thead-light">
+            <tr>
+                <th width="1">#</th>
+                <th>Имя</th>
+                <th>Фамилия</th>
+                <th>Отчество</th>
+                <th>Роль</th>
+                <th>Логин</th>
+                <th>Заметки</th>
+                <th>Email личный</th>
+                <th>Email рабочий</th>
+                <th>Телефон личный</th>
+                <th>Телефон рабочий</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(item, index) in _values" :key="index">
+                <td>{{ index + 1 }}</td>
+                <td class="hidden">
+                    <input type="hidden" v-model="item.Id">
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Name }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" v-model="item.Name">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Surname }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" v-model="item.Surname">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Middlename }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" type="text" v-model="item.Middlename">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Roles }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" v-model="item.Roles">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Login }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" type="text" v-model="item.Login">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Notes }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" type="text" v-model="item.Notes">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Emails[0].Value }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" type="text" v-model="item.Emails[0].Value">
+                    </span>
+                </td>
+                <td>
+                    <span v-if="typeof(item.Emails[1]) !== 'undefined'">
+                        <span v-if="editIndex !== index">{{ item.Emails[1].Value }}</span>
+                        <span v-if="editIndex === index">
+                            <input class="form-control form-control-sm" type="text" v-model="item.Emails[1].Value">
+                        </span>
+                    </span>
+                    <span v-if="typeof(item.Emails[1]) === 'undefined' && editIndex === index"> <input class="form-control form-control-sm" type="text" v-model="item.Email2"></span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">{{ item.Phones[0].Value }}</span>
+                    <span v-if="editIndex === index">
+                        <input class="form-control form-control-sm" type="text" v-model="item.Phones[0].Value">
+                    </span> 
+                </td>
+                <td>
+                    <span v-if="typeof(item.Phones[1]) !== 'undefined'">
+                        <span v-if="editIndex !== index">{{ item.Phones[1].Value }}</span>
+                        <span v-if="editIndex === index">
+                            <input class="form-control form-control-sm" type="text" v-model="item.Phones[1].Value">
+                        </span>
+                    </span>
+                    <span v-if="typeof(item.Phones[1]) === 'undefined' && editIndex === index"> <input class="form-control form-control-sm" type="text" v-model="item.Phone2"></span>
+                </td>
+                <td>
+                    <span v-if="editIndex !== index">
+                        <button @@click="edit(item, index)" class="btn btn-sm btn-outline-secondary mr-2">Редактировать</button>
+                        @*<button @@click="remove(item, index)" class="btn btn-sm btn-outline-secondary mr-2">Удалить</button>*@
+                    </span>
+                    <span v-else>
+                        <button class="btn btn-sm btn-outline-secondary mr-2" @@click="cancel(item)">Отмена</button>
+                        <button class="btn btn-sm btn-outline-secondary mr-2" @@click="save2(item)">Сохранить</button>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+      
+    <h4>Дата и время изменения профиля</h4>
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th width="1">#</th>
+                <th>Профиль</th>
+                <th>Дата изменения профиля</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(item, index) in _values" :key="index">
+                <td>{{ index + 1 }}</td>
+                <td>{{ item.Name }}</td>
+                <td><span v-for="item2 in _values[index].Changes">{{ item2.Date }}<br /></span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<a class="btn btn-info" href="" v-on:click.prevent="logout">Выйти</a>

@@ -1,0 +1,50 @@
+﻿<h2>Основная ифнормация</h2>
+<hr />
+<p>
+    <label class="label" for="Username">Логин</label>
+    <input class="form-control" type="text" v-model="Username" name="Username" placeholder="Логин">
+</p>
+<p>
+    <label class="label" for="Email">Email</label>
+    <input class="form-control" type="email" v-model="reg_values.Email" name="Email" placeholder="Email">
+</p>
+<p>
+    <label class="label" for="Password">Пароль *</label>
+    <input class="form-control" type="password" v-model="reg_values.Password" name="reg_values.Password" placeholder="Пароль">
+</p>
+<p>
+    <label class="label" for="Phone">Телефон *</label>
+    <input class="form-control" type="tel" v-model="reg_values.Phone" name="Phone" placeholder="Телефон">
+</p>
+<hr />
+<h2>Личная ифнормация</h2>
+<hr />
+<p>
+    <label class="label" for="Name">Имя *</label>
+    <input class="form-control" type="text" v-model="reg_values.Name" name="Name" placeholder="Ваше имя">
+</p>
+<p>
+    <label class="label" for="Surname">Фамилия *</label>
+    <input class="form-control" type="text" v-model="reg_values.Surname" name="Surname" placeholder="Ваша фамилия">
+</p>
+<p>
+    <label class="label" for="Middlename">Отчество (не обязательно)</label>
+    <input class="form-control" type="text" v-model="reg_values.Middlename" name="Middlename" placeholder="Ваше отчество">
+</p>
+<p>
+    <label class="label" for="City">Город проживания*</label>
+    <input class="form-control" type="text" v-model="reg_values.City" name="City" placeholder="Город проживания">
+</p>
+<p>
+    <label class="label" for="Street1">Адрес проживания*</label>
+    <input class="form-control" type="text" v-model="reg_values.Street1" name="Street1" placeholder="Адрес проживания">
+</p>
+<p>
+    <label class="label" for="Street2">Адрес кореспондеции*</label>
+    <input class="form-control" type="text" v-model="reg_values.Street2" name="Street2" placeholder="Адрес кореспондеции">
+</p>
+<p>
+    <label class="label" for="PostalCode">Почтовый индекс*</label>
+    <input class="form-control" type="tel" v-model="reg_values.PostalCode" name="PostalCode" placeholder="Почтовый индекс">
+</p>
+<a v-on:click.prevent="registration()" class="btn btn-success" href="">Зарегистрироваться</a>
